@@ -298,6 +298,116 @@ body[data-site-shell="market"] {
     linear-gradient(180deg, rgba(7, 17, 31, 1) 0%, rgba(12, 23, 43, 1) 100%);
 }
 
+.factory-brand-social-signal {
+  background-image:
+    radial-gradient(ellipse 90% 55% at 0% -10%, rgba(250, 226, 81, 0.45), transparent 52%),
+    radial-gradient(circle at 100% 0%, rgba(215, 86, 86, 0.22), transparent 38%),
+    linear-gradient(180deg, #f0f0f0 0%, #faf8f5 42%, #eeeeee 100%);
+}
+
+.factory-palette-social-signal {
+  --background: #eeeeee;
+  --foreground: #2a1218;
+  --card: #fffefb;
+  --card-foreground: #2a1218;
+  --popover: #fffefb;
+  --popover-foreground: #2a1218;
+  --primary: #bd114a;
+  --primary-foreground: #fffefb;
+  --secondary: #fae251;
+  --secondary-foreground: #2a1218;
+  --muted: #ebe6e0;
+  --muted-foreground: #5c454c;
+  --accent: #d75656;
+  --accent-foreground: #fffefb;
+  --destructive: #bd114a;
+  --destructive-foreground: #fffefb;
+  --border: rgba(189, 17, 74, 0.14);
+  --input: #fffefb;
+  --ring: #d75656;
+}
+
+.factory-font-social h1,
+.factory-font-social h2,
+.factory-font-social h3,
+.factory-font-social h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.035em;
+}
+
+body[data-site-shell='image-profile-home'] {
+  background-attachment: fixed;
+}
+
+body[data-motion-pack='studio-stagger'].factory-brand-social-signal main > section {
+  animation: social-rise 0.58s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+body[data-motion-pack='studio-stagger'].factory-brand-social-signal main > section:nth-child(1) {
+  animation-delay: 0.02s;
+}
+body[data-motion-pack='studio-stagger'].factory-brand-social-signal main > section:nth-child(2) {
+  animation-delay: 0.08s;
+}
+body[data-motion-pack='studio-stagger'].factory-brand-social-signal main > section:nth-child(3) {
+  animation-delay: 0.14s;
+}
+body[data-motion-pack='studio-stagger'].factory-brand-social-signal main > section:nth-child(4) {
+  animation-delay: 0.2s;
+}
+
+@keyframes social-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-motion-pack='studio-stagger'].factory-brand-social-signal main > section {
+    animation: none;
+  }
+}
+
+/* Task detail skins: same markup, varied rhythm when social-signal brand is active */
+.factory-brand-social-signal main[data-task-detail='article'] .max-w-4xl h1 {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  line-height: 1.12;
+}
+
+.factory-brand-social-signal main[data-task-detail='article'] [class*='rounded-3xl'] {
+  border-radius: 1.25rem;
+  box-shadow: 0 28px 70px rgba(42, 18, 24, 0.08);
+}
+
+.factory-brand-social-signal main[data-task-detail='image'] .mt-4 {
+  margin-top: 1.25rem;
+}
+
+.factory-brand-social-signal main[data-task-detail='profile'] h1 {
+  letter-spacing: -0.04em;
+}
+
+.factory-brand-social-signal main[data-task-detail='classified'] .rounded-2xl,
+.factory-brand-social-signal main[data-task-detail='listing'] .rounded-2xl {
+  border-radius: 1rem;
+  box-shadow: 0 16px 48px rgba(42, 18, 24, 0.06);
+}
+
+.factory-brand-social-signal main[data-task-detail='sbm'] h1 {
+  font-family: var(--font-sans);
+  letter-spacing: -0.02em;
+}
+
+.factory-brand-social-signal main[data-task-detail='pdf'] h1 {
+  border-left: 4px solid var(--primary);
+  padding-left: 1rem;
+}
+
 .factory-brand-market {
   background-image:
     radial-gradient(circle at top left, rgba(132, 204, 22, 0.08), transparent 24%),

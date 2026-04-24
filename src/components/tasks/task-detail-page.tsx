@@ -145,7 +145,9 @@ export async function TaskDetailPage({ task, slug }: { task: TaskKey; slug: stri
   const isArticle = task === "article";
   const category = content.category || post.tags?.[0] || taskConfig?.label || task;
   const description = content.description || post.summary || "Details coming soon.";
-  const descriptionHtml = !isArticle ? formatRichHtml(description, "Details coming soon.") : "";
+  const isProfile = task === "profile";
+  const descriptionHtml = !isArticle && !isProfile ? formatRichHtml(description, "Details coming soon.") : "";
+  const profileBioHtml = isProfile ? formatArticleHtml(content, post) : "";
   const articleHtml = isArticle ? formatArticleHtml(content, post) : "";
   const articleSummary =
     post.summary ||
@@ -165,9 +167,9 @@ export async function TaskDetailPage({ task, slug }: { task: TaskKey; slug: stri
   const postTags = Array.isArray(post.tags) ? post.tags.filter((tag) => typeof tag === "string") : [];
   const location = content.address || content.location;
   const images = getImageUrls(post, content);
-  const mapEmbedUrl = buildMapEmbedUrl(content.latitude, content.longitude, location);
+  const mapEmbedUrl = isProfile ? null : buildMapEmbedUrl(content.latitude, content.longitude, location);
   const isBookmark = task === "sbm" || task === "social";
-  const hideSidebar = isClassified || isArticle || task === "image" || isBookmark;
+  const hideSidebar = isClassified || isArticle || task === "image" || isBookmark || isProfile;
   const related = (await fetchTaskPosts(task, 6))
     .filter((item) => item.slug !== post.slug)
     .filter((item) => {
@@ -239,7 +241,7 @@ export async function TaskDetailPage({ task, slug }: { task: TaskKey; slug: stri
           description={description}
           category={category}
           images={images}
-          mapEmbedUrl={mapEmbedUrl}
+          mapEmbedUrl={task === "profile" ? null : mapEmbedUrl}
           related={related}
         />
         <Footer />
@@ -250,7 +252,7 @@ export async function TaskDetailPage({ task, slug }: { task: TaskKey; slug: stri
   return (
     <div className="min-h-screen bg-background">
       <NavbarShell />
-      <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <main data-task-detail={task} className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <SchemaJsonLd data={schemaPayload} />
         <Link
           href={taskConfig?.route || "/"}
@@ -316,21 +318,38 @@ export async function TaskDetailPage({ task, slug }: { task: TaskKey; slug: stri
                   </div>
                 ) : null}
 
-                <div className={cn(isClassified ? "mx-auto w-full max-w-4xl" : "mt-6")}>
+                <div className={cn(isClassified ? "mx-auto w-full max-w-4xl" : "mt-6", isProfile && "mx-auto max-w-3xl")}>
                   <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                     <Badge variant="secondary" className="inline-flex items-center gap-1">
                       <Tag className="h-3.5 w-3.5" />
                       {category}
                     </Badge>
-                    {location && (
+                    {location && !isProfile ? (
                       <span className="inline-flex items-center gap-1">
                         <MapPin className="h-4 w-4" />
                         {location}
                       </span>
-                    )}
+                    ) : null}
                   </div>
                   <h1 className="mt-4 text-3xl font-semibold text-foreground">{post.title}</h1>
-                  <RichContent html={descriptionHtml} className="mt-3 max-w-3xl" />
+                  {isProfile && typeof content.excerpt === "string" && content.excerpt.trim() ? (
+                    <p className="mt-3 text-lg leading-relaxed text-muted-foreground">{content.excerpt.trim()}</p>
+                  ) : null}
+                  <RichContent
+                    html={isProfile ? profileBioHtml : descriptionHtml}
+                    className={cn("mt-3 max-w-3xl", isProfile && "prose-p:my-5 prose-headings:scroll-mt-24")}
+                  />
+                  {isProfile && content.phone ? (
+                    <div className="mt-10 rounded-2xl border border-border bg-card p-6">
+                      <h2 className="text-lg font-semibold text-foreground">Contact</h2>
+                      <div className="mt-4 space-y-3 text-sm text-muted-foreground">
+                        <div className="flex items-start gap-2">
+                          <Phone className="mt-0.5 h-4 w-4 shrink-0" />
+                          <span>{content.phone}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               </>
             ) : null}

@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { MapPin, Phone } from "lucide-react";
 import { Footer } from "@/components/shared/footer";
 import { NavbarShell } from "@/components/shared/navbar-shell";
 import { ContentImage } from "@/components/shared/content-image";
 import { TaskPostCard } from "@/components/shared/task-post-card";
-import { Button } from "@/components/ui/button";
 import { SchemaJsonLd } from "@/components/seo/schema-jsonld";
 import { buildPostUrl } from "@/lib/task-data";
 import { buildPostMetadata, buildTaskMetadata } from "@/lib/seo";
@@ -41,7 +41,7 @@ const formatRichHtml = (raw?: string | null, fallback = "Profile details will ap
 };
 
 export async function generateStaticParams() {
-  const posts = await fetchTaskPosts("profile", 50);
+  const posts = await fetchTaskPosts("profile", 50, { allowMockFallback: true, fresh: true });
   if (!posts.length) {
     return [{ username: "placeholder" }];
   }
@@ -51,7 +51,9 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ username: string }> }) {
   const resolvedParams = await params;
   try {
-    const post = await fetchTaskPostBySlug("profile", resolvedParams.username);
+    const post = await fetchTaskPostBySlug("profile", resolvedParams.username, {
+      allowMockFallback: true,
+    });
     return post ? await buildPostMetadata("profile", post) : await buildTaskMetadata("profile");
   } catch (error) {
     console.warn("Profile metadata lookup failed", error);
@@ -61,24 +63,30 @@ export async function generateMetadata({ params }: { params: Promise<{ username:
 
 export default async function ProfileDetailPage({ params }: { params: Promise<{ username: string }> }) {
   const resolvedParams = await params;
-  const post = await fetchTaskPostBySlug("profile", resolvedParams.username);
+  const post = await fetchTaskPostBySlug("profile", resolvedParams.username, {
+    allowMockFallback: true,
+  });
   if (!post) {
     notFound();
   }
-  const content = (post.content || {}) as Record<string, any>;
+  const content = (post.content || {}) as Record<string, unknown>;
   const logoUrl = typeof content.logo === "string" ? content.logo : undefined;
   const brandName =
-    (content.brandName as string | undefined) ||
-    (content.companyName as string | undefined) ||
-    (content.name as string | undefined) ||
+    (typeof content.brandName === "string" && content.brandName) ||
+    (typeof content.companyName === "string" && content.companyName) ||
+    (typeof content.name === "string" && content.name) ||
     post.title;
-  const website = content.website as string | undefined;
-  const domain = website ? website.replace(/^https?:\/\//, "").replace(/\/.*$/, "") : undefined;
-  const description =
-    (content.description as string | undefined) ||
-    post.summary ||
-    "Profile details will appear here once available.";
-  const descriptionHtml = formatRichHtml(description);
+  const location =
+    (typeof content.address === "string" && content.address.trim()) ||
+    (typeof content.location === "string" && content.location.trim()) ||
+    "";
+  const phone = typeof content.phone === "string" ? content.phone.trim() : "";
+  const rawBio =
+    (typeof content.body === "string" && content.body.trim()) ||
+    (typeof content.description === "string" && content.description.trim()) ||
+    (typeof post.summary === "string" && post.summary.trim()) ||
+    "";
+  const descriptionHtml = formatRichHtml(rawBio);
   const suggestedArticles = await fetchTaskPosts("article", 6);
   const baseUrl = SITE_CONFIG.baseUrl.replace(/\/$/, "");
   const breadcrumbData = {
@@ -126,21 +134,36 @@ export default async function ProfileDetailPage({ params }: { params: Promise<{ 
             </div>
             <div>
               <h1 className="text-3xl font-bold text-foreground sm:text-4xl">{brandName}</h1>
-              {domain ? (
-                <p className="mt-1 text-sm font-medium text-muted-foreground">{domain}</p>
-              ) : null}
               <article
                 className="article-content prose prose-slate mt-6 max-w-2xl text-base leading-relaxed prose-p:my-4 prose-a:text-primary prose-a:underline prose-strong:font-semibold"
                 dangerouslySetInnerHTML={{ __html: descriptionHtml }}
               />
-              {website ? (
-                <div className="mt-8">
-                  <Button asChild size="lg" className="px-7 text-base">
-                    <Link href={website} target="_blank" rel="noopener noreferrer">
-                      Visit Official Site
-                    </Link>
-                  </Button>
-                </div>
+
+              {location || phone ? (
+                <dl className="mt-8 grid max-w-xl gap-4 rounded-2xl border border-border bg-muted/40 p-5 sm:grid-cols-1">
+                  {location ? (
+                    <div>
+                      <dt className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        <MapPin className="h-4 w-4" aria-hidden />
+                        Location
+                      </dt>
+                      <dd className="mt-1 text-sm text-foreground">{location}</dd>
+                    </div>
+                  ) : null}
+                  {phone ? (
+                    <div>
+                      <dt className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        <Phone className="h-4 w-4" aria-hidden />
+                        Phone
+                      </dt>
+                      <dd className="mt-1 text-sm text-foreground">
+                        <a href={`tel:${phone.replace(/\s+/g, "")}`} className="text-primary hover:underline">
+                          {phone}
+                        </a>
+                      </dd>
+                    </div>
+                  ) : null}
+                </dl>
               ) : null}
             </div>
           </div>

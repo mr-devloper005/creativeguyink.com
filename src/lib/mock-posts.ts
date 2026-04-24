@@ -119,6 +119,22 @@ const randomFrom = (items: string[], index: number) =>
 const buildImage = (task: TaskKey, index: number) =>
   `https://picsum.photos/seed/${taskSeeds[task]}-${index}/1200/800`;
 
+/**
+ * Square-crop portrait URLs aligned to `taskTitles.profile` order (Unsplash).
+ * Picked to read as South Asian / Desi where names suggest it (Aisha Khan, Rohan Patel, Maya Desai).
+ */
+const profilePortraitUrl = (index: number) => {
+  const crop = "auto=format&w=720&h=720&fit=crop&q=82";
+  const portraits = [
+    `https://images.unsplash.com/photo-1769275061356-a038b498c4a7?${crop}`, // 0 Aisha Khan — woman in sari, portrait
+    `https://images.unsplash.com/photo-1712425718137-491250cfde88?${crop}`, // 1 Rohan Patel — man, professional portrait
+    `https://images.unsplash.com/photo-1635013941270-4af7456b9b95?${crop}`, // 2 Studio R&R — woman in sari, editorial / creative
+    `https://images.unsplash.com/photo-1647689662423-7948c8523256?${crop}`, // 3 Team Northwind — man, confident studio lead
+    `https://images.unsplash.com/photo-1671881641527-0a1ee842e13e?${crop}`, // 4 Maya Desai — woman in red & gold sari
+  ];
+  return portraits[index % portraits.length];
+};
+
 export const getMockPostsForTask = (task: TaskKey): SitePost[] => {
   return Array.from({ length: 5 }).map((_, index) => {
     const title = taskTitles[task][index];
@@ -128,6 +144,11 @@ export const getMockPostsForTask = (task: TaskKey): SitePost[] => {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
 
+    const cities = ["New Delhi", "Mumbai", "Bengaluru", "Hyderabad", "Chennai"];
+    const city = cities[index % cities.length];
+
+    const primaryImageUrl = task === "profile" ? profilePortraitUrl(index) : buildImage(task, index);
+
     return {
       id: `${task}-mock-${index + 1}`,
       title,
@@ -136,12 +157,17 @@ export const getMockPostsForTask = (task: TaskKey): SitePost[] => {
       content: {
         type: task,
         category,
-        location: "Delhi",
-        description: summaryByTask[task],
-        website: "https://example.com",
-        phone: "+91-9999999999",
+        location: city,
+        address: `${city} — public studio & remote`,
+        description:
+          task === "profile"
+            ? `${summaryByTask[task]} ${title} works across product, content, and community programs.`
+            : summaryByTask[task],
+        website: task === "profile" ? undefined : "https://example.com",
+        phone: `+91-98765${String(43210 + index).slice(-5)}`,
+        ...(task === "profile" ? { logo: primaryImageUrl } : {}),
       },
-      media: [{ url: buildImage(task, index), type: "IMAGE" }],
+      media: [{ url: primaryImageUrl, type: "IMAGE" }],
       tags: [task, category],
       authorName: "Site Master Pro",
       publishedAt: new Date().toISOString(),

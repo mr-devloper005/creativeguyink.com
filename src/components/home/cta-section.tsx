@@ -31,9 +31,11 @@ export function CTASection() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild className="h-12 rounded-full border-white/20 bg-white/8 px-7 text-sm font-semibold text-white hover:bg-white/12 hover:text-white">
-                <Link href={siteContent.cta.secondaryCta.href}>{siteContent.cta.secondaryCta.label}</Link>
-              </Button>
+              {siteContent.cta.secondaryCta.label ? (
+                <Button size="lg" variant="outline" asChild className="h-12 rounded-full border-white/20 bg-white/8 px-7 text-sm font-semibold text-white hover:bg-white/12 hover:text-white">
+                  <Link href={siteContent.cta.secondaryCta.href}>{siteContent.cta.secondaryCta.label}</Link>
+                </Button>
+              ) : null}
             </div>
           </div>
         </div>

@@ -2,13 +2,13 @@ import type { SiteRecipe } from '@/design/factory/recipe-types'
 
 export const SITE_RECIPE: SiteRecipe = {
   productFamily: 'visual',
-  themePack: 'visual-portfolio',
+  themePack: 'ink-social',
   homepageTemplate: 'image-profile-home',
   navbarTemplate: 'floating-bar',
-  footerTemplate: 'minimal-footer',
+  footerTemplate: 'dense-footer',
   motionPack: 'studio-stagger',
   primaryTask: 'profile',
-  enabledTasks: ['profile'],
+  enabledTasks: ['profile', 'image'],
   taskTemplates: { profile: 'profile-creator', image: 'image-portfolio' },
   manualOverrides: {
     navbar: false,

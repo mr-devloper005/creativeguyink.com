@@ -1,4 +1,4 @@
-export type BrandPackKey = 'editorial-luxe' | 'directory-clean' | 'studio-dark' | 'market-utility'
+export type BrandPackKey = 'editorial-luxe' | 'directory-clean' | 'studio-dark' | 'market-utility' | 'social-signal'
 export type NavbarLayoutKey = 'editorial-bar' | 'compact-bar' | 'floating-bar' | 'utility-bar'
 export type FooterLayoutKey = 'editorial-footer' | 'columns-footer' | 'dense-footer' | 'minimal-footer'
 export type HomeLayoutKey = 'article-home' | 'listing-home' | 'image-profile-home' | 'classified-home'

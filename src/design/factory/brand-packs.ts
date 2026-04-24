@@ -37,4 +37,13 @@ export const BRAND_PACKS: Record<BrandPack['key'], BrandPack> = {
     surfaceClassName: 'factory-surface-market',
     accentClassName: 'factory-accent-market',
   },
+  'social-signal': {
+    key: 'social-signal',
+    displayName: 'Social Signal',
+    bodyClassName: 'factory-brand-social-signal',
+    fontClassName: 'factory-font-social',
+    paletteClassName: 'factory-palette-social-signal',
+    surfaceClassName: 'factory-surface-social-signal',
+    accentClassName: 'factory-accent-social-signal',
+  },
 }
