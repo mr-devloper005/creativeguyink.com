@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { FileText, Building2, LayoutGrid, Tag, Github, Twitter, Linkedin, Image as ImageIcon, User, ArrowRight, Sparkles } from 'lucide-react'
+import { FileText, Building2, LayoutGrid, Tag, Image as ImageIcon, User, ArrowRight, Sparkles } from 'lucide-react'
 import { SITE_CONFIG, type TaskKey } from '@/lib/site-config'
 import { siteContent } from '@/config/site.content'
 import { getFactoryState } from '@/design/factory/get-factory-state'
@@ -30,12 +30,11 @@ const footerLinks = {
     { name: 'Careers', href: '/careers' },
     { name: 'Blog', href: '/blog' },
     { name: 'Press', href: '/press' },
+    { name: 'Contact', href: '/contact' },
   ],
   resources: [
-    { name: 'Help Center', href: '/help' },
-    { name: 'Community', href: '/community' },
-    { name: 'Developers', href: '/developers' },
     { name: 'Status', href: '/status' },
+    { name: 'Contact', href: '/contact' },
   ],
   legal: [
     { name: 'Privacy', href: '/privacy' },
@@ -45,12 +44,6 @@ const footerLinks = {
   ],
 }
 
-const socialLinks = [
-  { name: 'Twitter', href: 'https://twitter.com', icon: Twitter },
-  { name: 'GitHub', href: 'https://github.com', icon: Github },
-  { name: 'LinkedIn', href: 'https://linkedin.com', icon: Linkedin },
-]
-
 export function Footer() {
   if (FOOTER_OVERRIDE_ENABLED) {
     return <FooterOverride />
@@ -59,6 +52,7 @@ export function Footer() {
   const { recipe } = getFactoryState()
   const enabledTasks = SITE_CONFIG.tasks.filter((task) => task.enabled)
   const primaryTask = enabledTasks.find((task) => task.key === recipe.primaryTask) || enabledTasks[0]
+  const isSocialBrand = recipe.brandPack === 'social-signal'
 
   if (recipe.footer === 'minimal-footer') {
     return (
@@ -82,22 +76,51 @@ export function Footer() {
 
   if (recipe.footer === 'dense-footer') {
     return (
-      <footer className="border-t border-white/10 bg-[linear-gradient(180deg,#07111f_0%,#0b1a2e_100%)] text-white">
+      <footer
+        className={
+          isSocialBrand
+            ? 'border-t border-border bg-gradient-to-b from-card to-muted text-foreground'
+            : 'border-t border-white/10 bg-[linear-gradient(180deg,#07111f_0%,#0b1a2e_100%)] text-white'
+        }
+      >
         <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr_1fr]">
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-7">
+            <div
+              className={
+                isSocialBrand
+                  ? 'rounded-[2rem] border border-border bg-background/80 p-7 shadow-[0_20px_60px_rgba(42,18,24,0.06)]'
+                  : 'rounded-[2rem] border border-white/10 bg-white/5 p-7'
+              }
+            >
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/12 bg-white/8 p-1.5">
+                <div
+                  className={
+                    isSocialBrand
+                      ? 'flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-card p-1.5 shadow-sm'
+                      : 'flex h-12 w-12 items-center justify-center rounded-2xl border border-white/12 bg-white/8 p-1.5'
+                  }
+                >
                   <img src="/favicon.png?v=20260401" alt={`${SITE_CONFIG.name} logo`} width="48" height="48" className="h-full w-full object-contain" />
                 </div>
                 <div>
                   <p className="text-lg font-semibold">{SITE_CONFIG.name}</p>
-                  <p className="text-xs uppercase tracking-[0.24em] text-slate-400">{siteContent.footer.tagline}</p>
+                  <p className={isSocialBrand ? 'text-xs uppercase tracking-[0.24em] text-muted-foreground' : 'text-xs uppercase tracking-[0.24em] text-slate-400'}>
+                    {siteContent.footer.tagline}
+                  </p>
                 </div>
               </div>
-              <p className="mt-5 max-w-md text-sm leading-7 text-slate-300">{SITE_CONFIG.description}</p>
+              <p className={isSocialBrand ? 'mt-5 max-w-md text-sm leading-7 text-muted-foreground' : 'mt-5 max-w-md text-sm leading-7 text-slate-300'}>
+                {SITE_CONFIG.description}
+              </p>
               {primaryTask ? (
-                <Link href={primaryTask.route} className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#8df0c8] px-4 py-2.5 text-sm font-semibold text-[#07111f] hover:bg-[#77dfb8]">
+                <Link
+                  href={primaryTask.route}
+                  className={
+                    isSocialBrand
+                      ? 'mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-accent'
+                      : 'mt-6 inline-flex items-center gap-2 rounded-full bg-[#8df0c8] px-4 py-2.5 text-sm font-semibold text-[#07111f] hover:bg-[#77dfb8]'
+                  }
+                >
                   Explore {primaryTask.label}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -105,34 +128,45 @@ export function Footer() {
             </div>
             <div className="grid gap-6 sm:grid-cols-2 lg:col-span-2 lg:grid-cols-3">
               <div>
-                <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Surfaces</h3>
-                <ul className="mt-4 space-y-3 text-sm text-slate-200">
+                <h3 className={isSocialBrand ? 'text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground' : 'text-xs font-semibold uppercase tracking-[0.24em] text-slate-400'}>
+                  Explore
+                </h3>
+                <ul className={isSocialBrand ? 'mt-4 space-y-3 text-sm text-foreground' : 'mt-4 space-y-3 text-sm text-slate-200'}>
                   {footerLinks.platform.map((item: any) => (
-                    <li key={item.name}><Link href={item.href} className="flex items-center gap-2 hover:text-white">{item.icon ? <item.icon className="h-4 w-4" /> : null}{item.name}</Link></li>
+                    <li key={item.name}>
+                      <Link href={item.href} className={`flex items-center gap-2 ${isSocialBrand ? 'hover:text-primary' : 'hover:text-white'}`}>
+                        {item.icon ? <item.icon className="h-4 w-4" /> : null}
+                        {item.name}
+                      </Link>
+                    </li>
                   ))}
                 </ul>
               </div>
               <div>
-                <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Resources</h3>
-                <ul className="mt-4 space-y-3 text-sm text-slate-200">
+                <h3 className={isSocialBrand ? 'text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground' : 'text-xs font-semibold uppercase tracking-[0.24em] text-slate-400'}>
+                  Resources
+                </h3>
+                <ul className={isSocialBrand ? 'mt-4 space-y-3 text-sm text-foreground' : 'mt-4 space-y-3 text-sm text-slate-200'}>
                   {footerLinks.resources.map((item) => (
-                    <li key={item.name}><Link href={item.href} className="hover:text-white">{item.name}</Link></li>
+                    <li key={item.name}>
+                      <Link href={item.href} className={isSocialBrand ? 'hover:text-primary' : 'hover:text-white'}>
+                        {item.name}
+                      </Link>
+                    </li>
                   ))}
                 </ul>
-              </div>
-              <div>
-                <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Connect</h3>
-                <div className="mt-4 flex gap-3">
-                  {socialLinks.map((item) => (
-                    <Link key={item.name} href={item.href} target="_blank" rel="noopener noreferrer" className="rounded-full border border-white/10 bg-white/8 p-2.5 text-slate-200 hover:bg-white/12 hover:text-white">
-                      <item.icon className="h-4 w-4" />
-                    </Link>
-                  ))}
-                </div>
               </div>
             </div>
           </div>
-          <div className="mt-10 border-t border-white/10 pt-5 text-sm text-slate-400">&copy; {new Date().getFullYear()} {SITE_CONFIG.name}. All rights reserved.</div>
+          <div
+            className={
+              isSocialBrand
+                ? 'mt-10 border-t border-border pt-5 text-sm text-muted-foreground'
+                : 'mt-10 border-t border-white/10 pt-5 text-sm text-slate-400'
+            }
+          >
+            &copy; {new Date().getFullYear()} {SITE_CONFIG.name}. All rights reserved.
+          </div>
         </div>
       </footer>
     )

@@ -1,14 +1,18 @@
 import Link from 'next/link'
 import { ArrowRight, Building2, FileText, Image as ImageIcon, LayoutGrid, Tag, User } from 'lucide-react'
+import { ContentImage } from '@/components/shared/content-image'
 import { NavbarShell } from '@/components/shared/navbar-shell'
 import { Footer } from '@/components/shared/footer'
+import { TaskPostCard } from '@/components/shared/task-post-card'
 import { TaskListClient } from '@/components/tasks/task-list-client'
 import { SchemaJsonLd } from '@/components/seo/schema-jsonld'
-import { fetchTaskPosts } from '@/lib/task-data'
+import { fetchTaskPosts, getPostImages } from '@/lib/task-data'
 import { SITE_CONFIG, getTaskConfig, type TaskKey } from '@/lib/site-config'
 import { CATEGORY_OPTIONS, normalizeCategory } from '@/lib/categories'
 import { taskIntroCopy } from '@/config/site.content'
+import { samplePostsByTask } from '@/config/task-sample-posts'
 import { getFactoryState } from '@/design/factory/get-factory-state'
+import { cn } from '@/lib/utils'
 import { TASK_LIST_PAGE_OVERRIDE_ENABLED, TaskListPageOverride } from '@/overrides/task-list-page'
 
 const taskIcons: Record<TaskKey, any> = {
@@ -57,10 +61,23 @@ export async function TaskListPage({ task, category }: { task: TaskKey; category
   }))
   const { recipe } = getFactoryState()
   const layoutKey = recipe.taskLayouts[task as keyof typeof recipe.taskLayouts] || `${task}-${task === 'listing' ? 'directory' : 'editorial'}`
-  const shellClass = variantShells[layoutKey as keyof typeof variantShells] || 'bg-background'
+  const isSocialBrand = recipe.brandPack === 'social-signal'
+  const socialShells: Partial<Record<keyof typeof variantShells, string>> = isSocialBrand
+    ? {
+        'image-portfolio':
+          'bg-[radial-gradient(circle_at_18%_0%,rgba(250,226,81,0.35),transparent_42%),linear-gradient(180deg,#f7f4f0_0%,#eeeeee_100%)] text-foreground',
+        'profile-creator':
+          'bg-[radial-gradient(circle_at_100%_12%,rgba(215,86,86,0.14),transparent_38%),linear-gradient(180deg,#faf7f2_0%,#f0ebe4_100%)] text-foreground',
+      }
+    : {}
+  const shellClass =
+    (socialShells[layoutKey as keyof typeof socialShells] as string | undefined) ||
+    variantShells[layoutKey as keyof typeof variantShells] ||
+    'bg-background'
   const Icon = taskIcons[task] || LayoutGrid
+  const featuredSamples = samplePostsByTask[task] || []
 
-  const isDark = ['image-masonry', 'image-portfolio', 'profile-creator'].includes(layoutKey)
+  const isDark = !isSocialBrand && ['image-masonry', 'image-portfolio', 'profile-creator'].includes(layoutKey)
   const ui = isDark
     ? {
         muted: 'text-slate-300',
@@ -175,13 +192,56 @@ export async function TaskListPage({ task, category }: { task: TaskKey; category
               <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] ${ui.soft}`}>
                 <Icon className="h-3.5 w-3.5" /> Visual feed
               </div>
-              <h1 className="mt-5 text-5xl font-semibold tracking-[-0.05em]">{taskConfig?.description || 'Latest posts'}</h1>
-              <p className={`mt-5 max-w-2xl text-sm leading-8 ${ui.muted}`}>This surface leans into stronger imagery, larger modules, and more expressive spacing so visual content feels materially different from reading and directory pages.</p>
+              <h1 className="mt-5 text-5xl font-semibold tracking-[-0.05em]">{intro?.title || taskConfig?.description || 'Latest posts'}</h1>
+              <p className={`mt-5 max-w-2xl text-sm leading-8 ${ui.muted}`}>{intro?.paragraphs?.[0] || 'Browse visual posts with a layout tuned for imagery-first discovery.'}</p>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className={`min-h-[220px] rounded-[2rem] ${ui.panel}`} />
-              <div className={`min-h-[220px] rounded-[2rem] ${ui.soft}`} />
-              <div className={`col-span-2 min-h-[120px] rounded-[2rem] ${ui.panel}`} />
+            <div className="grid gap-4 sm:grid-cols-2">
+              {intro?.samples?.slice(0, 3).map((sample, index) => (
+                <div
+                  key={sample.title}
+                  className={cn(
+                    'rounded-[1.8rem] p-5 shadow-sm',
+                    index === 0 ? ui.panel : ui.soft,
+                    index === 2 && 'sm:col-span-2',
+                  )}
+                >
+                  <div className="mb-4 h-36 rounded-[1.35rem] bg-gradient-to-br from-current/10 to-transparent" />
+                  <p className={`text-[11px] font-semibold uppercase tracking-[0.22em] ${ui.muted}`}>{sample.eyebrow}</p>
+                  <h3 className="mt-3 text-lg font-semibold">{sample.title}</h3>
+                  <p className={`mt-2 text-sm leading-7 ${ui.muted}`}>{sample.description}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {task === 'profile' || task === 'image' ? (
+          <section className="mb-12">
+            <div className="mb-6 flex items-end justify-between gap-4">
+              <div>
+                <p className={`text-xs uppercase tracking-[0.28em] ${ui.muted}`}>Featured samples</p>
+                <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-foreground">
+                  {task === 'profile' ? 'Profiles worth opening' : 'Image posts worth exploring'}
+                </h2>
+              </div>
+            </div>
+            <div className="grid gap-6 lg:grid-cols-3">
+              {featuredSamples.slice(0, 3).map((post) => (
+                task === 'image' ? (
+                  <div key={post.id} className="overflow-hidden rounded-[1.8rem] border border-border bg-card shadow-sm">
+                    <div className="relative aspect-[4/5] overflow-hidden bg-muted">
+                      <ContentImage src={getPostImages(post)[0] || '/placeholder.jpg'} alt={post.title} fill className="object-cover" />
+                    </div>
+                    <div className="p-5">
+                      <p className={`text-[11px] font-semibold uppercase tracking-[0.22em] ${ui.muted}`}>{post.tags?.[0] || 'Image'}</p>
+                      <h3 className="mt-3 text-lg font-semibold text-foreground">{post.title}</h3>
+                      <p className={`mt-2 text-sm leading-7 ${ui.muted}`}>{post.summary || 'Visual story'}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <TaskPostCard key={post.id} post={post} href={`/${task}/${post.slug}`} taskKey={task} />
+                )
+              ))}
             </div>
           </section>
         ) : null}
@@ -189,11 +249,37 @@ export async function TaskListPage({ task, category }: { task: TaskKey; category
         {layoutKey === 'profile-creator' || layoutKey === 'profile-business' ? (
           <section className={`mb-12 rounded-[2.2rem] p-8 shadow-[0_24px_70px_rgba(15,23,42,0.1)] ${ui.panel}`}>
             <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
-              <div className={`min-h-[240px] rounded-[2rem] ${ui.soft}`} />
+              <div className="grid gap-4">
+                {intro?.samples?.slice(0, 3).map((sample, index) => (
+                  <div
+                    key={sample.title}
+                    className={cn(
+                      'rounded-[1.6rem] p-5',
+                      index === 0 ? 'bg-background/80' : index === 1 ? ui.soft : 'bg-background/60',
+                    )}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+                        {sample.title
+                          .split(' ')
+                          .slice(0, 2)
+                          .map((word) => word[0])
+                          .join('')
+                          .toUpperCase()}
+                      </div>
+                      <div>
+                        <p className={`text-[11px] font-semibold uppercase tracking-[0.22em] ${ui.muted}`}>{sample.eyebrow}</p>
+                        <h3 className="mt-2 text-lg font-semibold text-foreground">{sample.title}</h3>
+                        <p className={`mt-2 text-sm leading-7 ${ui.muted}`}>{sample.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
               <div>
                 <p className={`text-xs uppercase tracking-[0.3em] ${ui.muted}`}>{taskConfig?.label || task}</p>
-                <h1 className="mt-3 text-4xl font-semibold tracking-[-0.05em] text-foreground">Profiles with stronger identity, trust, and reputation cues.</h1>
-                <p className={`mt-5 max-w-2xl text-sm leading-8 ${ui.muted}`}>This layout prioritizes the person or business surface first, then lets the feed continue below without borrowing the same visual logic used by articles or listings.</p>
+                <h1 className="mt-3 text-4xl font-semibold tracking-[-0.05em] text-foreground">{intro?.title || taskConfig?.description || 'Latest posts'}</h1>
+                <p className={`mt-5 max-w-2xl text-sm leading-8 ${ui.muted}`}>{intro?.paragraphs?.[0] || 'Browse profiles and open individual pages to see how each identity is presented on this platform.'}</p>
               </div>
             </div>
           </section>
@@ -243,11 +329,23 @@ export async function TaskListPage({ task, category }: { task: TaskKey; category
             {intro.paragraphs.map((paragraph) => (
               <p key={paragraph.slice(0, 40)} className={`mt-4 text-sm leading-7 ${ui.muted}`}>{paragraph}</p>
             ))}
-            <div className="mt-4 flex flex-wrap gap-4 text-sm">
-              {intro.links.map((link) => (
-                <a key={link.href} href={link.href} className="font-semibold text-foreground hover:underline">{link.label}</a>
-              ))}
-            </div>
+            {intro.samples?.length ? (
+              <div className="mt-6 grid gap-4 md:grid-cols-3">
+                {intro.samples.map((sample) => (
+                  <div key={sample.title} className={`rounded-[1.5rem] p-5 ${ui.soft}`}>
+                    <p className={`text-[11px] font-semibold uppercase tracking-[0.22em] ${ui.muted}`}>{sample.eyebrow}</p>
+                    <h3 className="mt-3 text-lg font-semibold text-foreground">{sample.title}</h3>
+                    <p className={`mt-2 text-sm leading-7 ${ui.muted}`}>{sample.description}</p>
+                  </div>
+                ))}
+              </div>
+            ) : intro.links?.length ? (
+              <div className="mt-4 flex flex-wrap gap-4 text-sm">
+                {intro.links.map((link) => (
+                  <a key={link.href} href={link.href} className="font-semibold text-foreground hover:underline">{link.label}</a>
+                ))}
+              </div>
+            ) : null}
           </section>
         ) : null}
 

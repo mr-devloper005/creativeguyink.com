@@ -95,6 +95,22 @@ export const THEME_PACKS: Record<ThemePackDefinition['key'], ThemePackDefinition
     },
     notes: ['Portfolio-style hero', 'Large showcase panels', 'Less noisy support content'],
   },
+  'ink-social': {
+    key: 'ink-social',
+    label: 'Ink Social',
+    productFamily: 'visual',
+    brandPack: 'social-signal',
+    navbar: 'floating-bar',
+    footer: 'dense-footer',
+    homeLayout: 'image-profile-home',
+    motionPack: 'studio-stagger',
+    defaultTaskTemplates: {
+      image: 'image-portfolio',
+      profile: 'profile-creator',
+      article: 'article-editorial',
+    },
+    notes: ['Profile-forward social layer', 'Warm paper field with crimson signal', 'Top spotlight rail for discovery'],
+  },
   'curation-library': {
     key: 'curation-library',
     label: 'Curation Library',

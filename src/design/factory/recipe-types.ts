@@ -9,6 +9,7 @@ export type ThemePackKey =
   | 'magazine-contrast'
   | 'pinterest-creator'
   | 'visual-portfolio'
+  | 'ink-social'
   | 'curation-library'
   | 'curation-warm'
 
@@ -39,7 +40,7 @@ export type ThemePackDefinition = {
   key: ThemePackKey
   label: string
   productFamily: ProductFamily
-  brandPack: 'editorial-luxe' | 'directory-clean' | 'studio-dark' | 'market-utility'
+  brandPack: 'editorial-luxe' | 'directory-clean' | 'studio-dark' | 'market-utility' | 'social-signal'
   navbar: NavbarLayoutKey
   footer: FooterLayoutKey
   homeLayout: HomeLayoutKey

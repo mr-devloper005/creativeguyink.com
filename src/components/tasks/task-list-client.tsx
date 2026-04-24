@@ -7,6 +7,7 @@ import { normalizeCategory, isValidCategory } from "@/lib/categories";
 import type { TaskKey } from "@/lib/site-config";
 import type { SitePost } from "@/lib/site-connector";
 import { getLocalPostsForTask } from "@/lib/local-posts";
+import { samplePostsByTask } from '@/config/task-sample-posts';
 
 type Props = {
   task: TaskKey;
@@ -16,6 +17,7 @@ type Props = {
 
 export function TaskListClient({ task, initialPosts, category }: Props) {
   const localPosts = getLocalPostsForTask(task);
+  const samplePosts = samplePostsByTask[task] || [];
 
   const merged = useMemo(() => {
     const bySlug = new Set<string>();
@@ -33,16 +35,22 @@ export function TaskListClient({ task, initialPosts, category }: Props) {
       combined.push(post);
     });
 
+    samplePosts.forEach((post) => {
+      if (post.slug && bySlug.has(post.slug)) return;
+      combined.push(post);
+    });
+
     const normalizedCategory = category ? normalizeCategory(category) : "all";
     if (normalizedCategory === "all") {
-      return combined.filter((post) => {
+      const filtered = combined.filter((post) => {
         const content = post.content && typeof post.content === "object" ? post.content : {};
         const value = typeof (content as any).category === "string" ? (content as any).category : "";
         return !value || isValidCategory(value);
       });
+      return filtered.length ? filtered : samplePosts;
     }
 
-    return combined.filter((post) => {
+    const filtered = combined.filter((post) => {
       const content = post.content && typeof post.content === "object" ? post.content : {};
       const value =
         typeof (content as any).category === "string"
@@ -50,7 +58,8 @@ export function TaskListClient({ task, initialPosts, category }: Props) {
           : "";
       return value === normalizedCategory;
     });
-  }, [category, initialPosts, localPosts]);
+    return filtered.length ? filtered : samplePosts;
+  }, [category, initialPosts, localPosts, samplePosts]);
 
   if (!merged.length) {
     return (
