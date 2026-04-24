@@ -29,7 +29,7 @@ export const siteTaskDefinitions = [
     route: '/images',
     description: 'Galleries and media-first posts.',
     contentType: 'image',
-    enabled: false,
+    enabled: true,
   },
   {
     key: 'profile',

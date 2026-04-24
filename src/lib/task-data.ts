@@ -64,11 +64,19 @@ export const fetchTaskPosts = async (
   }
 };
 
-export const fetchTaskPostBySlug = async (task: TaskKey, slug: string) => {
-  const allowMockFallback = process.env.NEXT_PUBLIC_USE_MOCK_CONTENT === "true";
+export const fetchTaskPostBySlug = async (
+  task: TaskKey,
+  slug: string,
+  options?: { allowMockFallback?: boolean }
+) => {
+  const allowMockFallback =
+    options?.allowMockFallback ?? process.env.NEXT_PUBLIC_USE_MOCK_CONTENT === "true";
   const type = getTaskContentType(task);
+  const slugNorm = slug.trim().toLowerCase();
   const resolveFromFeed = (feed: SiteFeed<SitePost> | null) =>
-    feed?.posts.find((post) => post.slug === slug && getPostType(post) === type) || null;
+    feed?.posts.find(
+      (post) => post.slug.trim().toLowerCase() === slugNorm && getPostType(post) === type
+    ) || null;
 
   try {
     const cachedFeed = await fetchSiteFeed(200);
@@ -82,9 +90,11 @@ export const fetchTaskPostBySlug = async (task: TaskKey, slug: string) => {
     // fall through to mock data
   }
 
-  return allowMockFallback
-    ? getMockPostsForTask(task).find((post) => post.slug === slug) || null
-    : null;
+  if (!allowMockFallback) return null;
+
+  return (
+    getMockPostsForTask(task).find((post) => post.slug.trim().toLowerCase() === slugNorm) || null
+  );
 };
 
 export const buildPostUrl = (task: TaskKey, slug: string) => {
