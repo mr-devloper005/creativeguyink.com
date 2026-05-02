@@ -1,9 +1,7 @@
 import type { TaskKey } from '@/lib/site-config'
 
 export const siteContent = {
-  navbar: {
-    tagline: 'Connect with people',
-  },
+  navbar: {},
   footer: {
     tagline: 'Discover profiles and connect',
   },

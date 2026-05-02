@@ -51,6 +51,7 @@ export default function ContactPage() {
   const { recipe } = getFactoryState()
   const productKind = getProductKind(recipe)
   const tone = getTone(productKind)
+  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || "hello@creativeguyink.com"
   const lanes =
     productKind === 'directory'
       ? [
@@ -98,6 +99,17 @@ export default function ContactPage() {
 
           <div className={`rounded-[2rem] p-7 ${tone.panel}`}>
             <h2 className="text-2xl font-semibold">Send a message</h2>
+            <p className={`mt-3 text-sm leading-7 ${tone.muted}`}>
+              Prefer email? Reach us directly and manage the address through your environment settings.
+            </p>
+            <div className="mt-5">
+              <a
+                href={`mailto:${contactEmail}`}
+                className={`inline-flex h-11 items-center justify-center rounded-full px-5 text-sm font-semibold ${tone.action}`}
+              >
+                Email us at {contactEmail}
+              </a>
+            </div>
             <form className="mt-6 grid gap-4">
               <input className="h-12 rounded-xl border border-current/10 bg-transparent px-4 text-sm" placeholder="Your name" />
               <input className="h-12 rounded-xl border border-current/10 bg-transparent px-4 text-sm" placeholder="Email address" />
