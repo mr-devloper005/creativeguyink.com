@@ -98,8 +98,8 @@ export function Navbar() {
   const { recipe } = getFactoryState()
 
   const navigation = useMemo(() => {
-    const enabledList = SITE_CONFIG.tasks.filter((task) => task.enabled)
-    const orderedKeys = [...new Set<TaskKey>(['image', 'profile', recipe.primaryTask, ...recipe.enabledTasks])]
+    const enabledList = SITE_CONFIG.tasks.filter((task) => task.enabled && task.key !== 'profile')
+    const orderedKeys = [...new Set<TaskKey>(['image', recipe.primaryTask, ...recipe.enabledTasks])].filter(key => key !== 'profile')
     return orderedKeys
       .map((key) => enabledList.find((task) => task.key === key))
       .filter((task): task is (typeof SITE_CONFIG.tasks)[number] => Boolean(task))
@@ -128,7 +128,7 @@ export function Navbar() {
               </div>
               <div className="min-w-0 hidden sm:block">
                 <span className="block truncate text-xl font-semibold">{SITE_CONFIG.name}</span>
-                <span className="block text-[10px] uppercase tracking-[0.24em] opacity-60">{siteContent.navbar.tagline}</span>
+                {siteContent.navbar.tagline && <span className="block text-[10px] uppercase tracking-[0.24em] opacity-60">{siteContent.navbar.tagline}</span>}
               </div>
             </Link>
 
@@ -223,7 +223,7 @@ export function Navbar() {
             </div>
             <div className="min-w-0 hidden sm:block">
               <span className="block truncate text-xl font-semibold">{SITE_CONFIG.name}</span>
-              <span className="hidden text-[10px] uppercase tracking-[0.28em] opacity-70 sm:block">{siteContent.navbar.tagline}</span>
+              {siteContent.navbar.tagline && <span className="hidden text-[10px] uppercase tracking-[0.28em] opacity-70 sm:block">{siteContent.navbar.tagline}</span>}
             </div>
           </Link>
 

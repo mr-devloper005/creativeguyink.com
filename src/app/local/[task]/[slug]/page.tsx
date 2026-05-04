@@ -22,6 +22,7 @@ type PostContent = {
   phone?: string;
   email?: string;
   description?: string;
+  body?: string;
   highlights?: string[];
   logo?: string;
   images?: string[];
@@ -126,8 +127,12 @@ export default function LocalPostDetailPage() {
   }
 
   const category = content.category || post.tags?.[0] || taskConfig.label;
-  const description = content.description || post.summary || "Details coming soon.";
-  const descriptionHtml = formatRichHtml(description, "Details coming soon.");
+  const richDescription =
+    content.body ||
+    content.description ||
+    post.summary ||
+    "Details coming soon.";
+  const descriptionHtml = formatRichHtml(richDescription, "Details coming soon.");
   const location = content.address || content.location;
   const images = getImageUrls(post, content);
   const isArticle = task === "article";
@@ -153,7 +158,7 @@ export default function LocalPostDetailPage() {
                 <ContentImage src={images[0]} alt={post.title} fill className="object-cover" intrinsicWidth={1600} intrinsicHeight={900} />
               </div>
             ) : null}
-            <RichContent html={formatRichHtml(description, "Details coming soon.")} />
+            <RichContent html={descriptionHtml} />
           </div>
         ) : isPdf ? (
           <div className="mx-auto w-full max-w-4xl">
