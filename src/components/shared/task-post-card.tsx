@@ -113,6 +113,8 @@ export function TaskPostCard({
   const { recipe } = getFactoryState()
   const isDirectoryProduct = recipe.homeLayout === 'listing-home' || recipe.homeLayout === 'classified-home'
   const isDirectorySurface = isDirectoryProduct && (variant === 'listing' || variant === 'classified' || variant === 'profile')
+  const isImageCard = variant === 'image'
+  const isProfileCard = variant === 'profile'
 
   if (isDirectorySurface) {
     const cardTone = recipe.brandPack === 'market-utility'
@@ -156,6 +158,74 @@ export function TaskPostCard({
             {content.email ? <span className={`inline-flex items-center gap-1 ${cardTone.muted}`}><Mail className="h-3.5 w-3.5" />{content.email}</span> : null}
           </div>
           <div className={`mt-auto pt-5 text-sm font-semibold ${cardTone.cta}`}>{variant === 'classified' ? 'View offer' : 'View details'}</div>
+        </div>
+      </Link>
+    )
+  }
+
+  if (isImageCard) {
+    return (
+      <Link href={href} className="group flex h-full flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-white/6 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/10 hover:shadow-[0_28px_80px_rgba(15,23,42,0.28)]">
+        <div className="relative aspect-[4/5] overflow-hidden bg-[#0f172a]">
+          <ContentImage src={image} alt={altText} fill sizes={imageSizes} quality={78} className="object-cover transition-transform duration-700 group-hover:scale-[1.06]" intrinsicWidth={960} intrinsicHeight={1200} />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#04101f]/88 via-[#04101f]/18 to-transparent" />
+          <div className="absolute inset-x-0 top-0 flex items-center justify-between p-4">
+            <span className="rounded-full border border-white/18 bg-black/20 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/88">
+              {category}
+            </span>
+            <ArrowUpRight className="h-4 w-4 text-white/82 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </div>
+          <div className="absolute inset-x-0 bottom-0 p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/70">Visual note</p>
+            <h3 className="mt-2 line-clamp-2 text-2xl font-semibold leading-tight text-white">{post.title}</h3>
+          </div>
+        </div>
+        <div className="flex flex-1 flex-col p-5 text-white">
+          <p className="line-clamp-3 text-sm leading-7 text-white/72">{getExcerpt(content.description || post.summary, compact ? 110 : 150) || 'Explore this visual post.'}</p>
+          <div className="mt-auto flex items-center justify-between gap-3 pt-5">
+            {content.location ? <div className="inline-flex items-center gap-1 text-xs text-white/65"><MapPin className="h-3.5 w-3.5" />{content.location}</div> : <span className="text-xs uppercase tracking-[0.2em] text-white/50">Open story</span>}
+            <span className="text-xs font-semibold uppercase tracking-[0.22em] text-white/78">View image</span>
+          </div>
+        </div>
+      </Link>
+    )
+  }
+
+  if (isProfileCard) {
+    const initials = post.title
+      .split(' ')
+      .slice(0, 2)
+      .map((word) => word[0])
+      .join('')
+      .toUpperCase()
+
+    return (
+      <Link href={href} className="group flex h-full flex-col overflow-hidden rounded-[2rem] border border-[#d9c8bd] bg-[linear-gradient(180deg,rgba(255,251,247,0.98),rgba(250,239,230,0.98))] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(80,28,36,0.14)]">
+        <div className="relative px-5 pt-5">
+          <div className="absolute inset-x-5 top-5 h-28 rounded-[1.5rem] bg-[radial-gradient(circle_at_top_left,rgba(174,36,72,0.14),transparent_42%),linear-gradient(135deg,rgba(255,255,255,0.95),rgba(242,225,212,0.95))]" />
+          <div className="relative flex items-start gap-4">
+            <div className="relative mt-8 h-20 w-20 shrink-0 overflow-hidden rounded-[1.6rem] border border-white/70 bg-white shadow-sm">
+              {image !== '/placeholder.svg?height=640&width=960' ? (
+                <ContentImage src={image} alt={altText} fill sizes="96px" quality={78} className="object-cover transition-transform duration-500 group-hover:scale-[1.04]" intrinsicWidth={160} intrinsicHeight={160} />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-[#f4e8dd] text-lg font-semibold text-[#6e1a37]">
+                  {initials || 'P'}
+                </div>
+              )}
+            </div>
+            <div className="relative flex-1 pt-10">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8b6b5d]">{category}</p>
+              <h3 className="mt-2 line-clamp-2 text-2xl font-semibold leading-tight text-[#261811]">{post.title}</h3>
+              {content.location ? <div className="mt-2 inline-flex items-center gap-1 text-xs text-[#7a6155]"><MapPin className="h-3.5 w-3.5" />{content.location}</div> : null}
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-1 flex-col px-5 pb-5 pt-4">
+          <p className="line-clamp-4 text-sm leading-7 text-[#71574a]">{getExcerpt(content.description || post.summary, compact ? 120 : 180) || 'Explore this profile.'}</p>
+          <div className="mt-auto flex items-center justify-between gap-3 pt-5">
+            {content.email ? <div className="inline-flex items-center gap-1 text-xs text-[#7a6155]"><Mail className="h-3.5 w-3.5" />{content.email}</div> : <span className="text-xs uppercase tracking-[0.2em] text-[#9a7b6c]">Profile detail</span>}
+            <span className="text-xs font-semibold uppercase tracking-[0.22em] text-[#261811]">Open profile</span>
+          </div>
         </div>
       </Link>
     )

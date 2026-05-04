@@ -7,7 +7,7 @@ import { Footer } from "@/components/shared/footer";
 import { TaskPostCard } from "@/components/shared/task-post-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { buildPostUrl, fetchTaskPostBySlug, fetchTaskPosts } from "@/lib/task-data";
+import { buildPostUrl, fetchTaskPostBySlug, fetchTaskPosts, getPostImages, getPostTaskKey } from "@/lib/task-data";
 import { SITE_CONFIG, getTaskConfig, type TaskKey } from "@/lib/site-config";
 import type { SitePost } from "@/lib/site-connector";
 import { TaskImageCarousel } from "@/components/tasks/task-image-carousel";
@@ -146,7 +146,13 @@ export async function TaskDetailPage({ task, slug }: { task: TaskKey; slug: stri
   const category = content.category || post.tags?.[0] || taskConfig?.label || task;
   const description = content.description || post.summary || "Details coming soon.";
   const isProfile = task === "profile";
-  const descriptionHtml = !isArticle && !isProfile ? formatRichHtml(description, "Details coming soon.") : "";
+  const isImage = task === "image";
+  const defaultRichSource =
+    (typeof content.body === "string" && content.body.trim()) ||
+    (typeof content.description === "string" && content.description.trim()) ||
+    (typeof post.summary === "string" && post.summary.trim()) ||
+    "";
+  const descriptionHtml = !isArticle && !isProfile ? formatRichHtml(defaultRichSource, "Details coming soon.") : "";
   const profileBioHtml = isProfile ? formatArticleHtml(content, post) : "";
   const articleHtml = isArticle ? formatArticleHtml(content, post) : "";
   const articleSummary =
@@ -173,6 +179,10 @@ export async function TaskDetailPage({ task, slug }: { task: TaskKey; slug: stri
   const related = (await fetchTaskPosts(task, 6))
     .filter((item) => item.slug !== post.slug)
     .filter((item) => {
+      if (task === "image") {
+        const itemTask = getPostTaskKey(item);
+        return itemTask === "image";
+      }
       if (!content.category) return true;
       const itemContent = getContent(item);
       return itemContent.category === content.category;
@@ -229,7 +239,7 @@ export async function TaskDetailPage({ task, slug }: { task: TaskKey; slug: stri
   const { recipe } = getFactoryState();
   const productKind = getProductKind(recipe);
 
-  if (productKind === "directory" && (task === "listing" || task === "classified" || task === "profile")) {
+  if (productKind === "directory" && (task === "listing" || task === "classified")) {
     return (
       <div className="min-h-screen bg-[#f8fbff]">
         <NavbarShell />
@@ -241,7 +251,7 @@ export async function TaskDetailPage({ task, slug }: { task: TaskKey; slug: stri
           description={description}
           category={category}
           images={images}
-          mapEmbedUrl={task === "profile" ? null : mapEmbedUrl}
+          mapEmbedUrl={mapEmbedUrl}
           related={related}
         />
         <Footer />
@@ -312,45 +322,147 @@ export async function TaskDetailPage({ task, slug }: { task: TaskKey; slug: stri
 
             {!isArticle ? (
               <>
-                {!isBookmark ? (
+                {!isBookmark && !isImage && !isProfile ? (
                   <div className={cn(isClassified ? "w-full" : "")}>
                     <TaskImageCarousel images={images} />
                   </div>
                 ) : null}
 
-                <div className={cn(isClassified ? "mx-auto w-full max-w-4xl" : "mt-6", isProfile && "mx-auto max-w-3xl")}>
-                  <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                    <Badge variant="secondary" className="inline-flex items-center gap-1">
-                      <Tag className="h-3.5 w-3.5" />
-                      {category}
-                    </Badge>
-                    {location && !isProfile ? (
-                      <span className="inline-flex items-center gap-1">
-                        <MapPin className="h-4 w-4" />
-                        {location}
-                      </span>
-                    ) : null}
-                  </div>
-                  <h1 className="mt-4 text-3xl font-semibold text-foreground">{post.title}</h1>
-                  {isProfile && typeof content.excerpt === "string" && content.excerpt.trim() ? (
-                    <p className="mt-3 text-lg leading-relaxed text-muted-foreground">{content.excerpt.trim()}</p>
-                  ) : null}
-                  <RichContent
-                    html={isProfile ? profileBioHtml : descriptionHtml}
-                    className={cn("mt-3 max-w-3xl", isProfile && "prose-p:my-5 prose-headings:scroll-mt-24")}
-                  />
-                  {isProfile && content.phone ? (
-                    <div className="mt-10 rounded-2xl border border-border bg-card p-6">
-                      <h2 className="text-lg font-semibold text-foreground">Contact</h2>
-                      <div className="mt-4 space-y-3 text-sm text-muted-foreground">
-                        <div className="flex items-start gap-2">
-                          <Phone className="mt-0.5 h-4 w-4 shrink-0" />
-                          <span>{content.phone}</span>
+                {isImage ? (
+                  <section className="space-y-8">
+                    <div className="grid gap-8 xl:grid-cols-[1.2fr_0.8fr] xl:items-start">
+                      <div className="order-2 xl:order-1 overflow-hidden rounded-[2rem] border border-white/10 bg-[#09111c] shadow-[0_28px_90px_rgba(15,23,42,0.24)] p-4">
+                        <div className="columns-1 sm:columns-2 gap-4 space-y-4">
+                          {images.map((src, index) => (
+                            <div key={`${src}-${index}`} className="break-inside-avoid relative overflow-hidden rounded-[1.5rem]">
+                              <ContentImage
+                                src={src}
+                                alt={`Image ${index + 1} for ${post.title}`}
+                                width={800}
+                                height={600}
+                                quality={85}
+                                className="object-cover w-full h-auto"
+                                priority={index === 0}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="order-1 xl:order-2 xl:sticky xl:top-6 rounded-[2rem] border border-[#1c3149] bg-[linear-gradient(180deg,#09111c_0%,#0f1b2d_100%)] p-7 text-white shadow-[0_24px_80px_rgba(15,23,42,0.22)]">
+                        <div className="flex flex-wrap items-center gap-3 text-sm text-white/70">
+                          <Badge className="border border-white/12 bg-white/8 text-white hover:bg-white/10">
+                            <Tag className="mr-1 h-3.5 w-3.5" />
+                            {category}
+                          </Badge>
+                          {location ? (
+                            <span className="inline-flex items-center gap-1">
+                              <MapPin className="h-4 w-4" />
+                              {location}
+                            </span>
+                          ) : null}
+                        </div>
+                        <h1 className="mt-5 text-4xl font-semibold leading-tight text-white">{post.title}</h1>
+                        <p className="mt-4 text-sm leading-8 text-white/68">
+                          {typeof content.excerpt === "string" && content.excerpt.trim()
+                            ? content.excerpt.trim()
+                            : post.summary || "A visual-first detail page built to keep the image at the center."}
+                        </p>
+                        <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                          {content.website ? (
+                            <Button className="h-11 bg-white text-slate-950 hover:bg-slate-200" asChild>
+                              <a href={content.website} target="_blank" rel="noreferrer">
+                                Visit source
+                              </a>
+                            </Button>
+                          ) : null}
+                          {content.email ? (
+                            <Button variant="outline" className="h-11 border-white/16 bg-transparent text-white hover:bg-white/10 hover:text-white" asChild>
+                              <a href={`mailto:${content.email}`}>
+                                Email creator
+                              </a>
+                            </Button>
+                          ) : null}
                         </div>
                       </div>
                     </div>
-                  ) : null}
-                </div>
+                  </section>
+                ) : null}
+
+                {isProfile ? (
+                  <section className="mt-8">
+                    <div className="mb-6">
+                      <div className="relative h-64 w-64 overflow-hidden rounded-2xl">
+                        <ContentImage src={images[0]} alt={post.title} fill className="object-cover" />
+                      </div>
+                    </div>
+
+                    <div className="mb-8">
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">{category || taskConfig?.label}</p>
+                      <h1 className="mt-2 text-3xl font-semibold text-foreground">{post.title}</h1>
+                      {content.website && (
+                        <a href={content.website} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+                          <Globe className="h-4 w-4" /> {content.website}
+                        </a>
+                      )}
+                    </div>
+
+                    <RichContent html={profileBioHtml} className="max-w-none text-base leading-7 text-muted-foreground prose-p:my-3" />
+
+                    {content.highlights && Array.isArray(content.highlights) && content.highlights.length > 0 && (
+                      <div className="mt-8 space-y-2">
+                        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Highlights</p>
+                        <ul className="space-y-1 text-sm text-muted-foreground">
+                          {(content.highlights as string[]).map((item: string) => (
+                            <li key={item} className="flex items-center gap-2">
+                              <span className="h-1 w-1 rounded-full bg-muted-foreground" />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    <div className="mt-8 space-y-4">
+                      {location && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <MapPin className="h-4 w-4" />
+                          {location}
+                        </div>
+                      )}
+                      {content.email && (
+                        <a href={`mailto:${content.email}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+                          <Mail className="h-4 w-4" />
+                          {content.email}
+                        </a>
+                      )}
+                      {content.phone && (
+                        <a href={`tel:${content.phone}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+                          <Phone className="h-4 w-4" />
+                          {content.phone}
+                        </a>
+                      )}
+                    </div>
+                  </section>
+                ) : null}
+
+                {!isImage && !isProfile ? (
+                  <div className={cn(isClassified ? "mx-auto w-full max-w-4xl" : "mt-6")}>
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                      <Badge variant="secondary" className="inline-flex items-center gap-1">
+                        <Tag className="h-3.5 w-3.5" />
+                        {category}
+                      </Badge>
+                      {location ? (
+                        <span className="inline-flex items-center gap-1">
+                          <MapPin className="h-4 w-4" />
+                          {location}
+                        </span>
+                      ) : null}
+                    </div>
+                    <h1 className="mt-4 text-3xl font-semibold text-foreground">{post.title}</h1>
+                    <RichContent html={descriptionHtml} className="mt-3 max-w-3xl" />
+                  </div>
+                ) : null}
               </>
             ) : null}
 
@@ -510,15 +622,74 @@ export async function TaskDetailPage({ task, slug }: { task: TaskKey; slug: stri
                 </Link>
               )}
             </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {related.map((item) => (
-                <TaskPostCard
-                  key={item.id}
-                  post={item}
-                  href={buildPostUrl(task, item.slug)}
-                />
-              ))}
-            </div>
+            {isImage ? (
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {related.map((item) => {
+                  const relatedImages = getImageUrls(item, getContent(item));
+                  const relatedCategory = getContent(item).category || item.tags?.[0] || 'Image';
+                  return (
+                    <Link
+                      key={item.id}
+                      href={buildPostUrl(task, item.slug)}
+                      className="group overflow-hidden rounded-[2rem] border shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                    >
+                      <div className="relative aspect-[4/5] overflow-hidden">
+                        <ContentImage
+                          src={relatedImages[0] || '/placeholder.jpg'}
+                          alt={item.title}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                        <div className="absolute inset-x-0 bottom-0 p-5">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80">{relatedCategory}</p>
+                          <h3 className="mt-2 text-xl font-semibold text-white leading-tight">{item.title}</h3>
+                          {item.summary && (
+                            <p className="mt-2 text-sm text-white/70 line-clamp-2">{item.summary}</p>
+                          )}
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {related.map((item) => (
+                  <TaskPostCard
+                    key={item.id}
+                    post={item}
+                    href={buildPostUrl(task, item.slug)}
+                  />
+                ))}
+              </div>
+            )}
+            {isProfile ? (
+              <div className="space-y-4">
+                {related.map((item) => (
+                  <Link
+                    key={item.id}
+                    href={buildPostUrl(task, item.slug)}
+                    className="flex items-center gap-4 py-3 border-b border-border last:border-0"
+                  >
+                    <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg">
+                      <ContentImage
+                        src={getPostImages(item)[0] || '/placeholder.jpg'}
+                        alt={item.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                        {(item.content as any)?.category || item.tags?.[0] || 'Profile'}
+                      </p>
+                      <h4 className="text-sm font-semibold text-foreground">{item.title}</h4>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ) : null}
             </>
           ) : null}
           <nav className="mt-6 rounded-2xl border border-border bg-card/60 p-4">
