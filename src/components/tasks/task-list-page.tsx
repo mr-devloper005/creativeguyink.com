@@ -145,7 +145,6 @@ export async function TaskListPage({ task, category }: { task: TaskKey; category
               <p className={`mt-4 max-w-2xl text-sm leading-7 ${ui.muted}`}>Built with a cleaner scan rhythm, stronger metadata grouping, and a structure designed for business discovery rather than editorial reading.</p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link href={taskConfig?.route || '#'} className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold ${ui.button}`}>Explore results <ArrowRight className="h-4 w-4" /></Link>
-                <Link href="/search" className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold ${ui.soft}`}>Open search</Link>
               </div>
             </div>
             <form className={`grid gap-3 rounded-[2rem] p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] ${ui.soft}`} action={taskConfig?.route || '#'}>
@@ -197,7 +196,40 @@ export async function TaskListPage({ task, category }: { task: TaskKey; category
             <p className={`mt-5 max-w-2xl text-sm leading-8 ${ui.muted}`}>{intro?.paragraphs?.[0] || 'Browse visual posts through a calmer, image-first surface that gives every card more presence and stronger storytelling rhythm.'}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href={taskConfig?.route || '#'} className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold ${isDark ? 'border border-white/12 bg-white/8 text-white hover:bg-white/12' : ui.button}`}>Explore visuals <ArrowRight className="h-4 w-4" /></Link>
-              <Link href="/search" className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold ${isDark ? 'border border-white/12 bg-transparent text-white/84 hover:bg-white/8' : ui.soft}`}>Search archive</Link>
+            </div>
+
+            <div className="mt-8">
+              <p className={`text-xs font-semibold uppercase tracking-[0.24em] ${ui.muted}`}>Categories</p>
+              <div className="mt-3 flex flex-wrap gap-3">
+                <Link
+                  href="/images"
+                  className={cn(
+                    'inline-flex items-center rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] transition',
+                    normalizedCategory === 'all'
+                      ? (isDark ? 'bg-white text-slate-950' : 'bg-slate-950 text-white')
+                      : (isDark ? 'border border-white/16 bg-white/6 text-white/88 hover:bg-white/12' : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-100'),
+                  )}
+                >
+                  All
+                </Link>
+                {CATEGORY_OPTIONS.slice(0, 10).map((item) => {
+                  const active = normalizedCategory === item.slug
+                  return (
+                    <Link
+                      key={item.slug}
+                      href={`/images?category=${item.slug}`}
+                      className={cn(
+                        'inline-flex items-center rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] transition',
+                        active
+                          ? (isDark ? 'bg-white text-slate-950' : 'bg-slate-950 text-white')
+                          : (isDark ? 'border border-white/16 bg-white/6 text-white/88 hover:bg-white/12' : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-100'),
+                      )}
+                    >
+                      {item.name}
+                    </Link>
+                  )
+                })}
+              </div>
             </div>
           </section>
         ) : null}

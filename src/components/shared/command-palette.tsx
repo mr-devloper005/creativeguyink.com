@@ -3,8 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from '@/components/ui/command'
-import { useToast } from '@/components/ui/use-toast'
-import { FileText, Plus, Tag, Bookmark, Settings, Search } from 'lucide-react'
+import { FileText, Plus, Tag, Bookmark, Settings } from 'lucide-react'
 
 const quickLinks = [
   { label: 'Go to Social Bookmarks', href: '/sbm', icon: Bookmark },
@@ -22,7 +21,6 @@ const createActions = [
 
 export function CommandPalette() {
   const router = useRouter()
-  const { toast } = useToast()
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
@@ -71,19 +69,6 @@ export function CommandPalette() {
               {item.label}
             </CommandItem>
           ))}
-        </CommandGroup>
-        <CommandSeparator />
-        <CommandGroup heading="Quick">
-          <CommandItem
-            onSelect={() => {
-              toast({ title: 'Search opened', description: 'Use the hero search or /search page.' })
-              router.push('/search')
-              setOpen(false)
-            }}
-          >
-            <Search className="mr-2 h-4 w-4" />
-            Open Search
-          </CommandItem>
         </CommandGroup>
       </CommandList>
     </CommandDialog>

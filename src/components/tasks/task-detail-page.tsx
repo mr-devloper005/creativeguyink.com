@@ -717,10 +717,10 @@ export async function TaskDetailPage({ task, slug }: { task: TaskKey; slug: stri
               ) : null}
               <li>
                 <Link
-                  href={`/search?q=${encodeURIComponent(category)}`}
+                  href={`${taskConfig?.route || `/${task}`}?category=${encodeURIComponent(category)}`}
                   className="text-primary underline-offset-4 hover:underline"
                 >
-                  Search more in {category}
+                  Browse more in {category}
                 </Link>
               </li>
             </ul>

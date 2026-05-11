@@ -9,37 +9,37 @@ import { CONTACT_PAGE_OVERRIDE_ENABLED, ContactPageOverride } from '@/overrides/
 function getTone(kind: ReturnType<typeof getProductKind>) {
   if (kind === 'directory') {
     return {
-      shell: 'bg-[#f8fbff] text-slate-950',
-      panel: 'border border-slate-200 bg-white',
-      soft: 'border border-slate-200 bg-slate-50',
-      muted: 'text-slate-600',
-      action: 'bg-slate-950 text-white hover:bg-slate-800',
+      shell: 'bg-[radial-gradient(circle_at_top_left,rgba(189,17,74,0.08),transparent_30%),linear-gradient(180deg,#f8f7f4_0%,#f1ece5_100%)] text-foreground',
+      panel: 'border border-border bg-card shadow-[0_24px_70px_rgba(42,18,24,0.08)]',
+      soft: 'border border-border bg-secondary/25',
+      muted: 'text-muted-foreground',
+      action: 'bg-primary text-primary-foreground hover:bg-accent',
     }
   }
   if (kind === 'editorial') {
     return {
-      shell: 'bg-[#fbf6ee] text-[#241711]',
-      panel: 'border border-[#dcc8b7] bg-[#fffdfa]',
-      soft: 'border border-[#e6d6c8] bg-[#fff4e8]',
-      muted: 'text-[#6e5547]',
-      action: 'bg-[#241711] text-[#fff1e2] hover:bg-[#3a241b]',
+      shell: 'bg-[radial-gradient(circle_at_top_left,rgba(189,17,74,0.08),transparent_28%),linear-gradient(180deg,#fbf7f2_0%,#f3ede5_100%)] text-foreground',
+      panel: 'border border-border bg-card shadow-[0_24px_70px_rgba(42,18,24,0.08)]',
+      soft: 'border border-border bg-secondary/25',
+      muted: 'text-muted-foreground',
+      action: 'bg-primary text-primary-foreground hover:bg-accent',
     }
   }
   if (kind === 'visual') {
     return {
-      shell: 'bg-[#07101f] text-white',
-      panel: 'border border-white/10 bg-white/6',
-      soft: 'border border-white/10 bg-white/5',
-      muted: 'text-slate-300',
-      action: 'bg-[#8df0c8] text-[#07111f] hover:bg-[#77dfb8]',
+      shell: 'bg-[radial-gradient(circle_at_20%_0%,rgba(250,226,81,0.18),transparent_38%),linear-gradient(180deg,#faf7f2_0%,#f0ebe4_100%)] text-foreground',
+      panel: 'border border-border bg-card/95 shadow-[0_24px_70px_rgba(42,18,24,0.08)]',
+      soft: 'border border-border bg-secondary/20',
+      muted: 'text-muted-foreground',
+      action: 'bg-primary text-primary-foreground hover:bg-accent',
     }
   }
   return {
-    shell: 'bg-[#f7f1ea] text-[#261811]',
-    panel: 'border border-[#ddcdbd] bg-[#fffaf4]',
-    soft: 'border border-[#e8dbce] bg-[#f3e8db]',
-    muted: 'text-[#71574a]',
-    action: 'bg-[#5b2b3b] text-[#fff0f5] hover:bg-[#74364b]',
+    shell: 'bg-[radial-gradient(circle_at_top_left,rgba(189,17,74,0.08),transparent_30%),linear-gradient(180deg,#f8f6f2_0%,#f0ebe3_100%)] text-foreground',
+    panel: 'border border-border bg-card shadow-[0_24px_70px_rgba(42,18,24,0.08)]',
+    soft: 'border border-border bg-secondary/25',
+    muted: 'text-muted-foreground',
+    action: 'bg-primary text-primary-foreground hover:bg-accent',
   }
 }
 
@@ -51,7 +51,6 @@ export default function ContactPage() {
   const { recipe } = getFactoryState()
   const productKind = getProductKind(recipe)
   const tone = getTone(productKind)
-  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || "hello@creativeguyink.com"
   const lanes =
     productKind === 'directory'
       ? [
@@ -83,7 +82,7 @@ export default function ContactPage() {
       <main className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <section className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] opacity-70">Contact {SITE_CONFIG.name}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">Contact {SITE_CONFIG.name}</p>
             <h1 className="mt-4 text-5xl font-semibold tracking-[-0.05em]">A support page that matches the product, not a generic contact form.</h1>
             <p className={`mt-5 max-w-2xl text-sm leading-8 ${tone.muted}`}>Tell us what you are trying to publish, fix, or launch. We will route it through the right lane instead of forcing every request into the same support bucket.</p>
             <div className="mt-8 space-y-4">
@@ -102,19 +101,11 @@ export default function ContactPage() {
             <p className={`mt-3 text-sm leading-7 ${tone.muted}`}>
               Prefer email? Reach us directly and manage the address through your environment settings.
             </p>
-            <div className="mt-5">
-              <a
-                href={`mailto:${contactEmail}`}
-                className={`inline-flex h-11 items-center justify-center rounded-full px-5 text-sm font-semibold ${tone.action}`}
-              >
-                Email us at {contactEmail}
-              </a>
-            </div>
             <form className="mt-6 grid gap-4">
-              <input className="h-12 rounded-xl border border-current/10 bg-transparent px-4 text-sm" placeholder="Your name" />
-              <input className="h-12 rounded-xl border border-current/10 bg-transparent px-4 text-sm" placeholder="Email address" />
-              <input className="h-12 rounded-xl border border-current/10 bg-transparent px-4 text-sm" placeholder="What do you need help with?" />
-              <textarea className="min-h-[180px] rounded-2xl border border-current/10 bg-transparent px-4 py-3 text-sm" placeholder="Share the full context so we can respond with the right next step." />
+              <input className="h-12 rounded-xl border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground" placeholder="Your name" />
+              <input className="h-12 rounded-xl border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground" placeholder="Email address" />
+              <input className="h-12 rounded-xl border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground" placeholder="What do you need help with?" />
+              <textarea className="min-h-[180px] rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground" placeholder="Share the full context so we can respond with the right next step." />
               <button type="submit" className={`inline-flex h-12 items-center justify-center rounded-full px-6 text-sm font-semibold ${tone.action}`}>Send message</button>
             </form>
           </div>
