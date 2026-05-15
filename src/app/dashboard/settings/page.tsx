@@ -10,7 +10,7 @@ export default function DashboardSettingsPage() {
       description="Manage your account and notification preferences."
       actions={
         <Button asChild>
-          <Link href="/settings/profile">Edit Profile</Link>
+          <Link href="/settings">Manage Settings</Link>
         </Button>
       }
     >

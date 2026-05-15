@@ -291,42 +291,8 @@ export function ClassifiedAdCard({ ad }: { ad: ClassifiedAd }) {
 }
 
 // Profile Card
-export function ProfileCard({ user, compact = false }: { user: User; compact?: boolean }) {
-  return (
-    <motion.div
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.2 }}
-    >
-      <Link href={`/profile/${user.id}`}>
-        <Card className="group overflow-hidden border-border bg-card transition-all hover:border-muted-foreground/20">
-          <CardContent className={cn('flex items-center gap-4', compact ? 'p-3' : 'p-5')}>
-            <Avatar className={cn(compact ? 'h-10 w-10' : 'h-14 w-14')}>
-              <AvatarImage src={user.avatar} alt={user.name} />
-              <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <h3 className="truncate font-semibold text-foreground">{user.name}</h3>
-                {user.isVerified && <BadgeCheck className="h-4 w-4 flex-shrink-0 text-accent" />}
-              </div>
-              {!compact && (
-                <p className="line-clamp-2 text-sm text-muted-foreground">{user.bio}</p>
-              )}
-              <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
-                <span>{user.followers.toLocaleString()} followers</span>
-                {user.location && (
-                  <span className="flex items-center gap-1">
-                    <MapPin className="h-3 w-3" />
-                    {user.location}
-                  </span>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </Link>
-    </motion.div>
-  )
+export function ProfileCard({ user: _user, compact: _compact = false }: { user: User; compact?: boolean }) {
+  return null
 }
 
 // Stats Card
