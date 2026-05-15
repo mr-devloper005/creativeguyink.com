@@ -19,7 +19,7 @@ const taskIcons: Record<TaskKey, any> = {
 }
 
 const footerLinks = {
-  platform: SITE_CONFIG.tasks.filter((task) => task.enabled).map((task) => ({
+  platform: SITE_CONFIG.tasks.filter((task) => task.enabled && task.key !== 'profile').map((task) => ({
     name: task.label,
     href: task.route,
     icon: taskIcons[task.key] || LayoutGrid,
@@ -112,19 +112,6 @@ export function Footer() {
               <p className={isSocialBrand ? 'mt-5 max-w-md text-sm leading-7 text-muted-foreground' : 'mt-5 max-w-md text-sm leading-7 text-slate-300'}>
                 {SITE_CONFIG.description}
               </p>
-              {primaryTask ? (
-                <Link
-                  href={primaryTask.route}
-                  className={
-                    isSocialBrand
-                      ? 'mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-accent'
-                      : 'mt-6 inline-flex items-center gap-2 rounded-full bg-[#8df0c8] px-4 py-2.5 text-sm font-semibold text-[#07111f] hover:bg-[#77dfb8]'
-                  }
-                >
-                  Explore {primaryTask.label}
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              ) : null}
             </div>
             <div className="grid gap-6 sm:grid-cols-2 lg:col-span-2 lg:grid-cols-3">
               <div>

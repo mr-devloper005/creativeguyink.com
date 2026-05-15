@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Search, Menu, X, User, FileText, Building2, LayoutGrid, Tag, Image as ImageIcon, ChevronRight, Sparkles, MapPin, Plus } from 'lucide-react'
+import { Menu, X, User, FileText, Building2, LayoutGrid, Tag, Image as ImageIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/lib/auth-context'
 import { SITE_CONFIG, type TaskKey } from '@/lib/site-config'
@@ -112,7 +112,6 @@ export function Navbar() {
     icon: taskIcons[task.key] || LayoutGrid,
   }))
   const primaryTask = SITE_CONFIG.tasks.find((task) => task.key === recipe.primaryTask && task.enabled) || navigation[0]
-  const showPrimaryTaskBadge = Boolean(primaryTask && primaryTask.key !== 'profile')
   const isDirectoryProduct = recipe.homeLayout === 'listing-home' || recipe.homeLayout === 'classified-home'
 
   if (isDirectoryProduct) {
@@ -144,39 +143,24 @@ export function Navbar() {
             </div>
           </div>
 
-          <div className="hidden min-w-0 flex-1 items-center justify-center lg:flex">
-            <div className={cn('flex w-full max-w-xl items-center gap-3 rounded-full px-4 py-3', palette.search)}>
-              <Search className="h-4 w-4" />
-              <span className="text-sm">Find businesses, spaces, and local services</span>
-              <div className="ml-auto hidden items-center gap-1 text-xs opacity-75 md:flex">
-                <MapPin className="h-3.5 w-3.5" />
-                Local discovery
-              </div>
-            </div>
-          </div>
-
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-            {showPrimaryTaskBadge ? (
-              <Link href={primaryTask.route} className="hidden items-center gap-2 rounded-full border border-current/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] opacity-75 md:inline-flex">
-                <Sparkles className="h-3.5 w-3.5" />
-                {primaryTask.label}
-              </Link>
-            ) : null}
-
             {isAuthenticated ? (
               <NavbarAuthControls />
             ) : (
-              <div className="hidden items-center gap-2 md:flex">
-                <Button variant="ghost" size="sm" asChild className="rounded-full px-4">
-                  <Link href="/login">Sign In</Link>
-                </Button>
-                <Button size="sm" asChild className={cn('rounded-full', palette.cta)}>
-                  <Link href="/register">
-                    <Plus className="mr-1 h-4 w-4" />
-                    Add Listing
-                  </Link>
-                </Button>
-              </div>
+              <>
+                <Link
+                  href="/login"
+                  className="hidden rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-secondary/30 sm:inline-flex"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/register"
+                  className="hidden rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-accent sm:inline-flex"
+                >
+                  Sign up
+                </Link>
+              </>
             )}
 
             <Button variant="ghost" size="icon" className="rounded-full lg:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
@@ -188,10 +172,6 @@ export function Navbar() {
         {isMobileMenuOpen && (
           <div className={palette.mobile}>
             <div className="space-y-2 px-4 py-4">
-              <div className={cn('mb-3 flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium', palette.search)}>
-                <Search className="h-4 w-4" />
-                Find businesses, spaces, and services
-              </div>
               {mobileNavigation.map((item) => {
                 const isActive = pathname.startsWith(item.href)
                 return (
@@ -281,33 +261,23 @@ export function Navbar() {
         </div>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-          {primaryTask && primaryTask.key !== 'profile' && (recipe.navbar === 'utility-bar' || recipe.navbar === 'floating-bar') ? (
-            <Link href={primaryTask.route} className="hidden items-center gap-2 rounded-full border border-current/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] opacity-80 md:inline-flex">
-              <Sparkles className="h-3.5 w-3.5" />
-              {primaryTask.label}
-            </Link>
-          ) : null}
-
-          {recipe.brandPack !== 'social-signal' ? (
-            <Button variant="ghost" size="icon" asChild className="hidden rounded-full md:flex">
-              <Link href="/search">
-                <Search className="h-5 w-5" />
-                <span className="sr-only">Search</span>
-              </Link>
-            </Button>
-          ) : null}
-
           {isAuthenticated ? (
             <NavbarAuthControls />
           ) : (
-            <div className="hidden items-center gap-2 md:flex">
-              <Button variant="ghost" size="sm" asChild className="rounded-full px-4">
-                <Link href="/login">Sign In</Link>
-              </Button>
-              <Button size="sm" asChild className={style.cta}>
-                <Link href="/register">{isEditorial ? 'Subscribe' : isUtility ? 'Post Now' : 'Get Started'}</Link>
-              </Button>
-            </div>
+            <>
+              <Link
+                href="/login"
+                className="hidden rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-secondary/30 sm:inline-flex"
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/register"
+                className="hidden rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-accent sm:inline-flex"
+              >
+                Sign up
+              </Link>
+            </>
           )}
 
           <Button variant="ghost" size="icon" className="rounded-full lg:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
@@ -316,33 +286,9 @@ export function Navbar() {
         </div>
       </nav>
 
-      {isFloating && primaryTask ? (
-        <div className="mx-auto hidden max-w-7xl px-4 pb-3 sm:px-6 lg:block lg:px-8">
-          <Link
-            href={primaryTask.route}
-            className={cn(
-              'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] backdrop-blur',
-              recipe.brandPack === 'social-signal'
-                ? 'border-border/50 bg-card/90 text-foreground shadow-sm hover:bg-secondary/50'
-                : 'border-white/12 bg-white/8 text-slate-200 hover:bg-white/12',
-            )}
-          >
-            Spotlight
-            <span>{primaryTask.label}</span>
-            <ChevronRight className="h-3.5 w-3.5" />
-          </Link>
-        </div>
-      ) : null}
-
       {isMobileMenuOpen && (
         <div className={style.mobile}>
           <div className="space-y-2 px-4 py-4">
-            {recipe.brandPack !== 'social-signal' ? (
-              <Link href="/search" onClick={() => setIsMobileMenuOpen(false)} className="mb-3 flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-sm font-semibold text-muted-foreground">
-                <Search className="h-4 w-4" />
-                Search the site
-              </Link>
-            ) : null}
             {mobileNavigation.map((item) => {
               const isActive = pathname.startsWith(item.href)
               return (

@@ -35,7 +35,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { loadFromStorage, saveToStorage, storageKeys } from "@/lib/local-storage"
 
 const settingsSections = [
-  { id: "profile", label: "Profile", icon: User },
+  { id: "profile", label: "Account", icon: User },
   { id: "notifications", label: "Notifications", icon: Bell },
   { id: "privacy", label: "Privacy & Security", icon: Shield },
   { id: "appearance", label: "Appearance", icon: Palette },
@@ -451,7 +451,7 @@ export default function SettingsPage() {
                       </>
                     ) : (
                       <Button onClick={() => setIsEditingProfile(true)}>
-                        Edit Profile
+                        Edit Account
                       </Button>
                     )}
                   </div>

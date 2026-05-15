@@ -53,7 +53,7 @@ export function CategorySection() {
                 transition={{ delay: index * 0.05 }}
               >
                 <Link
-                  href={`/search?category=${category.slug}`}
+                  href={`/articles?category=${category.slug}`}
                   className="group flex flex-col items-center rounded-xl border border-border bg-card p-6 transition-all hover:border-accent/50 hover:bg-secondary"
                 >
                   <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-secondary transition-colors group-hover:bg-accent/10">

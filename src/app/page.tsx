@@ -118,10 +118,9 @@ function getCurationTone() {
   }
 }
 
-function SocialProfileHome({ primaryTask, enabledTasks, profilePosts, listingPosts, articlePosts }: {
+function SocialProfileHome({ primaryTask, enabledTasks, listingPosts, articlePosts }: {
   primaryTask?: EnabledTask
   enabledTasks: EnabledTask[]
-  profilePosts: SitePost[]
   listingPosts: SitePost[]
   articlePosts: SitePost[]
 }) {
@@ -288,57 +287,22 @@ function EditorialHome({ primaryTask, articlePosts, supportTasks }: { primaryTas
 function VisualHome({
   primaryTask: _primaryTask,
   imagePosts,
-  profilePosts,
-  articlePosts: _articlePosts,
+  articlePosts,
 }: {
   primaryTask?: EnabledTask
   imagePosts: SitePost[]
-  profilePosts: SitePost[]
   articlePosts: SitePost[]
 }) {
-  const topProfiles = profilePosts.slice(0, 14)
-  const leadProfile = profilePosts[0]
   const imageGallery = imagePosts.slice(0, 7)
+  const heroPost = imageGallery[0] ?? articlePosts[0]
   const secondaryVisual = SITE_CONFIG.tasks.find((task) => task.key === 'image' && task.enabled)
 
   return (
     <main className="bg-background text-foreground">
-      <section className="border-b border-border/60 bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-          <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary/95 text-secondary-foreground shadow-inner">
-              <Zap className="h-5 w-5" aria-hidden />
-            </span>
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-primary-foreground/85">Top profiles</p>
-              <p className="text-sm font-medium text-primary-foreground/95">{siteContent.hero.featureCardTitle}</p>
-              <p className="mt-1 text-[10px] font-medium uppercase tracking-[0.2em] text-primary-foreground/70">Recently updated</p>
-            </div>
-          </div>
-          <div className="flex min-w-0 flex-1 gap-3 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:justify-end">
-            {topProfiles.map((post) => (
-              <Link
-                key={post.id}
-                href={getTaskHref('profile', post.slug)}
-                className="group flex shrink-0 snap-start flex-col items-center gap-2 rounded-2xl border border-primary-foreground/20 bg-primary-foreground/10 px-3 py-2 text-center backdrop-blur-sm transition hover:bg-primary-foreground/20"
-              >
-                <div className="relative h-14 w-14 overflow-hidden rounded-full border-2 border-secondary ring-2 ring-primary-foreground/20">
-                  <ContentImage src={getPostImage(post)} alt={post.title} fill className="object-cover transition duration-300 group-hover:scale-105" />
-                </div>
-                <span className="max-w-[5.5rem] truncate text-[11px] font-semibold leading-tight">{post.title}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
         <div className="grid gap-12 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
           <div>
-            <span className="editorial-label border-primary/15 bg-secondary/80 text-foreground">
-              <Sparkles className="h-3.5 w-3.5 text-primary" aria-hidden />
-              {siteContent.hero.badge}
-            </span>
             <h1 className="mt-8 text-4xl font-semibold leading-[1.08] tracking-[-0.045em] sm:text-5xl lg:text-[3.15rem]">
               {siteContent.hero.title.map((line, i) => (
                 <span key={line} className={cn('block', i === 1 && 'text-primary')}>
@@ -348,19 +312,6 @@ function VisualHome({
             </h1>
             <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">{siteContent.hero.description}</p>
             <div className="mt-10 flex flex-wrap gap-3">
-              <Link
-                href={siteContent.hero.primaryCta.href}
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[0_14px_40px_rgba(189,17,74,0.28)] transition hover:bg-accent hover:text-accent-foreground"
-              >
-                {siteContent.hero.primaryCta.label}
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href={siteContent.hero.secondaryCta.href}
-                className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground shadow-sm transition hover:border-primary/25 hover:bg-muted/60"
-              >
-                {siteContent.hero.secondaryCta.label}
-              </Link>
               {secondaryVisual ? (
                 <Link
                   href={secondaryVisual.route}
@@ -376,29 +327,18 @@ function VisualHome({
           <div className="relative">
             <div className="absolute -left-6 -top-6 hidden h-24 w-24 rounded-full bg-secondary/80 blur-2xl lg:block" aria-hidden />
             <div className="paper-panel relative overflow-hidden rounded-[2.25rem] p-1 sm:p-2">
-              {leadProfile ? (
-                <Link href={getTaskHref('profile', leadProfile.slug)} className="group block">
-                  <div className="relative aspect-[4/5] max-h-[460px] overflow-hidden rounded-[2rem] bg-muted">
-                    <ContentImage src={getPostImage(leadProfile)} alt={leadProfile.title} fill className="object-cover transition duration-500 group-hover:scale-[1.03]" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#2a1218]/88 via-transparent to-transparent" />
-                    <div className="absolute inset-x-0 bottom-0 space-y-2 p-6 sm:p-8">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-secondary">{siteContent.hero.focusLabel}</p>
-                      <h2 className="text-2xl font-semibold tracking-[-0.03em] text-primary-foreground sm:text-3xl">{leadProfile.title}</h2>
-                      <p className="line-clamp-3 text-sm leading-relaxed text-primary-foreground/85">{leadProfile.summary || SITE_CONFIG.tagline}</p>
-                      <span className="inline-flex items-center gap-2 pt-2 text-sm font-semibold text-secondary">
-                        View full profile
-                        <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
+              {heroPost ? (
+                <div className="rounded-[2rem] p-2">
+                  <TaskPostCard
+                    post={heroPost}
+                    href={imageGallery[0] ? getTaskHref('image', heroPost.slug) : getTaskHref('article', heroPost.slug)}
+                    taskKey={imageGallery[0] ? 'image' : 'article'}
+                  />
+                </div>
               ) : (
                 <div className="flex min-h-[360px] flex-col items-center justify-center gap-4 rounded-[2rem] border border-dashed border-border bg-muted/40 p-10 text-center">
-                  <User className="h-12 w-12 text-muted-foreground" />
-                  <p className="max-w-sm text-sm text-muted-foreground">Your featured profile will anchor this space once live content is connected.</p>
-                  <Link href="/profile" className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-accent">
-                    Browse directory
-                  </Link>
+                  <Sparkles className="h-12 w-12 text-muted-foreground" />
+                  <p className="max-w-sm text-sm text-muted-foreground">No featured post available yet.</p>
                 </div>
               )}
             </div>
@@ -413,9 +353,6 @@ function VisualHome({
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">{siteContent.home.introBadge}</p>
               <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-[-0.04em] text-foreground">{siteContent.home.introTitle}</h2>
             </div>
-            <Link href={siteContent.home.primaryLink.href} className="shrink-0 text-sm font-semibold text-primary hover:underline">
-              {siteContent.home.primaryLink.label}
-            </Link>
           </div>
           <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
             <div className="space-y-5 text-sm leading-relaxed text-muted-foreground">
@@ -493,10 +430,9 @@ function VisualHome({
   )
 }
 
-function CurationHome({ primaryTask, bookmarkPosts, profilePosts, articlePosts }: { primaryTask?: EnabledTask; bookmarkPosts: SitePost[]; profilePosts: SitePost[]; articlePosts: SitePost[] }) {
+function CurationHome({ primaryTask, bookmarkPosts, articlePosts }: { primaryTask?: EnabledTask; bookmarkPosts: SitePost[]; articlePosts: SitePost[] }) {
   const tone = getCurationTone()
   const collections = bookmarkPosts.length ? bookmarkPosts.slice(0, 4) : articlePosts.slice(0, 4)
-  const people = profilePosts.slice(0, 3)
 
   return (
     <main className={tone.shell}>
@@ -516,10 +452,7 @@ function CurationHome({ primaryTask, bookmarkPosts, profilePosts, articlePosts }
                 Open collections
                 <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/profile" className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold ${tone.actionAlt}`}>
-                Explore curators
-              </Link>
-            </div>
+                          </div>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
@@ -533,23 +466,10 @@ function CurationHome({ primaryTask, bookmarkPosts, profilePosts, articlePosts }
           </div>
         </div>
 
-        <div className="mt-12 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className={`rounded-[2rem] p-7 ${tone.panel}`}>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] opacity-70">Why this feels different</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">More like saved boards and reading shelves than a generic post feed.</h2>
-            <p className={`mt-4 max-w-2xl text-sm leading-8 ${tone.muted}`}>The structure is calmer, the cards are less noisy, and the page encourages collecting and returning instead of forcing everything into a fast-scrolling list.</p>
-          </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            {people.map((post) => (
-              <Link key={post.id} href={`/profile/${post.slug}`} className={`rounded-[1.8rem] p-5 ${tone.soft}`}>
-                <div className="relative h-32 overflow-hidden rounded-[1.2rem]">
-                  <ContentImage src={getPostImage(post)} alt={post.title} fill className="object-cover" />
-                </div>
-                <h3 className="mt-4 text-lg font-semibold">{post.title}</h3>
-                <p className={`mt-2 text-sm leading-7 ${tone.muted}`}>Curator profile, saved resources, and collection notes.</p>
-              </Link>
-            ))}
-          </div>
+        <div className={`mt-12 rounded-[2rem] p-7 ${tone.panel}`}>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] opacity-70">Why this feels different</p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">More like saved boards and reading shelves than a generic post feed.</h2>
+          <p className={`mt-4 max-w-2xl text-sm leading-8 ${tone.muted}`}>The structure is calmer, the cards are less noisy, and the page encourages collecting and returning instead of forcing everything into a fast-scrolling list.</p>
         </div>
       </section>
     </main>
@@ -561,7 +481,7 @@ export default async function HomePage() {
     return <HomePageOverride />
   }
 
-  const enabledTasks = SITE_CONFIG.tasks.filter((task) => task.enabled)
+  const enabledTasks = SITE_CONFIG.tasks.filter((task) => task.enabled && task.key !== 'profile')
   const { recipe } = getFactoryState()
   const productKind = getProductKind(recipe)
   const taskFeed: TaskFeedItem[] = (
@@ -579,10 +499,7 @@ export default async function HomePage() {
   const classifiedPosts = taskFeed.find(({ task }) => task.key === 'classified')?.posts || []
   const articlePosts = taskFeed.find(({ task }) => task.key === 'article')?.posts || []
   const imagePosts = taskFeed.find(({ task }) => task.key === 'image')?.posts || []
-  const profilePosts = taskFeed.find(({ task }) => task.key === 'profile')?.posts || []
   const bookmarkPosts = taskFeed.find(({ task }) => task.key === 'sbm')?.posts || []
-
-  const profilePostsForHome = await fetchTaskPosts('profile', 24, { allowMockFallback: true, fresh: true })
 
   const schemaData = [
     {
@@ -614,7 +531,6 @@ export default async function HomePage() {
         <SocialProfileHome
           primaryTask={primaryTask}
           enabledTasks={enabledTasks}
-          profilePosts={profilePosts}
           listingPosts={listingPosts}
           articlePosts={articlePosts}
         />
@@ -623,10 +539,10 @@ export default async function HomePage() {
         <EditorialHome primaryTask={primaryTask} articlePosts={articlePosts} supportTasks={supportTasks} />
       ) : null}
       {productKind === 'visual' ? (
-        <VisualHome primaryTask={primaryTask} imagePosts={imagePosts} profilePosts={profilePostsForHome} articlePosts={articlePosts} />
+        <VisualHome primaryTask={primaryTask} imagePosts={imagePosts} articlePosts={articlePosts} />
       ) : null}
       {productKind === 'curation' ? (
-        <CurationHome primaryTask={primaryTask} bookmarkPosts={bookmarkPosts} profilePosts={profilePosts} articlePosts={articlePosts} />
+        <CurationHome primaryTask={primaryTask} bookmarkPosts={bookmarkPosts} articlePosts={articlePosts} />
       ) : null}
       <Footer />
     </div>

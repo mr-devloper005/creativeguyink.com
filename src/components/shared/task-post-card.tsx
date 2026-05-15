@@ -221,10 +221,10 @@ export function TaskPostCard({
           </div>
         </div>
         <div className="flex flex-1 flex-col px-5 pb-5 pt-4">
-          <p className="line-clamp-4 text-sm leading-7 text-[#71574a]">{getExcerpt(content.description || post.summary, compact ? 120 : 180) || 'Explore this profile.'}</p>
+          <p className="line-clamp-4 text-sm leading-7 text-[#71574a]">{getExcerpt(content.description || post.summary, compact ? 120 : 180) || 'Explore this post.'}</p>
           <div className="mt-auto flex items-center justify-between gap-3 pt-5">
-            {content.email ? <div className="inline-flex items-center gap-1 text-xs text-[#7a6155]"><Mail className="h-3.5 w-3.5" />{content.email}</div> : <span className="text-xs uppercase tracking-[0.2em] text-[#9a7b6c]">Profile detail</span>}
-            <span className="text-xs font-semibold uppercase tracking-[0.22em] text-[#261811]">Open profile</span>
+            {content.email ? <div className="inline-flex items-center gap-1 text-xs text-[#7a6155]"><Mail className="h-3.5 w-3.5" />{content.email}</div> : <span className="text-xs uppercase tracking-[0.2em] text-[#9a7b6c]">Details</span>}
+            <span className="text-xs font-semibold uppercase tracking-[0.22em] text-[#261811]">View details</span>
           </div>
         </div>
       </Link>
