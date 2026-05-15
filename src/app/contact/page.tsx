@@ -5,6 +5,7 @@ import { SITE_CONFIG } from '@/lib/site-config'
 import { getFactoryState } from '@/design/factory/get-factory-state'
 import { getProductKind } from '@/design/factory/get-product-kind'
 import { CONTACT_PAGE_OVERRIDE_ENABLED, ContactPageOverride } from '@/overrides/contact-page'
+import { ContactLeadForm } from "@/components/shared/contact-lead-form";
 
 function getTone(kind: ReturnType<typeof getProductKind>) {
   if (kind === 'directory') {
